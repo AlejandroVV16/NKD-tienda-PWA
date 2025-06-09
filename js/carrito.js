@@ -6,7 +6,7 @@ const contenedorCarritoVacio = document.querySelector("#carrito-vacio");
 const contenedorCarritoProductos = document.querySelector("#carrito-productos");
 const contenedorCarritoAcciones = document.querySelector("#carrito-acciones");
 const contenedorCarritoComprado = document.querySelector("#carrito-comprado");
-let botonesEliminar = document.querySelectorAll(".carrito-producto-eliminar");
+let botonesEliminar = [];
 const botonVaciar = document.querySelector("#carrito-acciones-vaciar");
 const contenedorTotal = document.querySelector("#total");
 const botonComprar = document.querySelector("#carrito-acciones-comprar");
@@ -18,24 +18,20 @@ const NOMBRE_TIENDA = "NKD Pereira";
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('Carrito: Inicializando...');
-    
-    // Esperar a que el DBManager esté disponible
+
     await esperarDBManager();
-    
-    // Migrar datos de localStorage si existen
-    await migrarDatosLocalStorage();
-    
-    // Cargar productos del carrito
+
+    // Eliminar migración desde localStorage para evitar borrado accidental de datos
+    // Ahora solo cargamos productos desde IndexedDB
     await cargarProductosCarrito();
-    
+
     console.log('Carrito: Inicialización completada');
 });
 
-// También escuchar el evento dbReady en caso de que ya se haya disparado
+// También escuchar el evento dbReady por si la DB se inicializa después
 window.addEventListener('dbReady', async () => {
     if (!dbManager) {
         await esperarDBManager();
-        await migrarDatosLocalStorage();
         await cargarProductosCarrito();
     }
 });
@@ -56,41 +52,11 @@ async function esperarDBManager() {
     });
 }
 
-// Migrar datos de localStorage a IndexedDB
-async function migrarDatosLocalStorage() {
-    try {
-        const datosLocalStorage = localStorage.getItem("productos-en-carrito");
-        
-        if (datosLocalStorage) {
-            const productos = JSON.parse(datosLocalStorage);
-            console.log('Carrito: Migrando datos de localStorage:', productos.length, 'productos');
-            
-            // Guardar cada producto en IndexedDB
-            for (const producto of productos) {
-                try {
-                    await dbManager.agregarAlCarrito(producto);
-                } catch (error) {
-                    console.error('Carrito: Error al migrar producto:', error);
-                }
-            }
-            
-            // Limpiar localStorage después de la migración
-            localStorage.removeItem("productos-en-carrito");
-            console.log('Carrito: Migración completada y localStorage limpiado');
-            
-            // Mostrar notificación de migración
-            mostrarToast('Datos del carrito actualizados correctamente', 'success');
-        }
-    } catch (error) {
-        console.error('Carrito: Error durante la migración:', error);
-    }
-}
-
-// Cargar productos del carrito desde IndexedDB
+// Cargar productos del carrito desde IndexedDB y renderizar en DOM
 async function cargarProductosCarrito() {
     try {
         console.log('Carrito: Cargando productos...');
-        
+
         if (!dbManager) {
             console.error('Carrito: DBManager no disponible');
             mostrarCarritoVacio();
@@ -105,14 +71,14 @@ async function cargarProductosCarrito() {
             contenedorCarritoProductos.classList.remove("disabled");
             contenedorCarritoAcciones.classList.remove("disabled");
             contenedorCarritoComprado.classList.add("disabled");
-        
+
             contenedorCarritoProductos.innerHTML = "";
-        
+
             productosEnCarrito.forEach(producto => {
                 const div = document.createElement("div");
                 div.classList.add("carrito-producto");
                 div.innerHTML = `
-                    <img class="carrito-producto-imagen" src="${producto.imagen}" alt="${producto.titulo}" loading="lazy">
+                    <img class="carrito-producto-imagen" src="${producto.imagen}" alt="${producto.titulo}" loading="lazy" />
                     <div class="carrito-producto-titulo">
                         <small>Repuesto</small>
                         <h3>${producto.titulo}</h3>
@@ -120,9 +86,9 @@ async function cargarProductosCarrito() {
                     <div class="carrito-producto-cantidad">
                         <small>Cantidad</small>
                         <div class="cantidad-controles">
-                            <button class="cantidad-btn" data-id="${producto.id}" data-action="decrementar">-</button>
+                            <button class="cantidad-btn" data-id="${producto.id}" data-action="decrementar" aria-label="Disminuir cantidad de ${producto.titulo}">-</button>
                             <p class="cantidad-valor">${producto.cantidad}</p>
-                            <button class="cantidad-btn" data-id="${producto.id}" data-action="incrementar">+</button>
+                            <button class="cantidad-btn" data-id="${producto.id}" data-action="incrementar" aria-label="Aumentar cantidad de ${producto.titulo}">+</button>
                         </div>
                     </div>
                     <div class="carrito-producto-precio">
@@ -133,14 +99,14 @@ async function cargarProductosCarrito() {
                         <small>Subtotal</small>
                         <p>$${(producto.precio * producto.cantidad).toLocaleString('es-CO')}</p>
                     </div>
-                    <button class="carrito-producto-eliminar" data-id="${producto.id}">
+                    <button class="carrito-producto-eliminar" data-id="${producto.id}" aria-label="Eliminar ${producto.titulo} del carrito">
                         <i class="bi bi-trash-fill"></i>
                     </button>
                 `;
-        
-                contenedorCarritoProductos.append(div);
+
+                contenedorCarritoProductos.appendChild(div);
             });
-        
+
             actualizarBotonesEliminar();
             actualizarBotonesCantidad();
             actualizarTotal();
@@ -150,7 +116,6 @@ async function cargarProductosCarrito() {
     } catch (error) {
         console.error('Carrito: Error al cargar productos:', error);
         mostrarCarritoVacio();
-        mostrarToast('Error al cargar el carrito', 'error');
     }
 }
 
@@ -162,92 +127,72 @@ function mostrarCarritoVacio() {
     contenedorCarritoComprado.classList.add("disabled");
 }
 
-// Actualizar botones de eliminar
+// Actualizar botones eliminar de cada producto
 function actualizarBotonesEliminar() {
     botonesEliminar = document.querySelectorAll(".carrito-producto-eliminar");
-
     botonesEliminar.forEach(boton => {
+        boton.removeEventListener("click", eliminarDelCarrito);
         boton.addEventListener("click", eliminarDelCarrito);
     });
 }
 
-// Actualizar botones de cantidad
+// Actualizar botones de cantidad (+ / -)
 function actualizarBotonesCantidad() {
     const botonesCantidad = document.querySelectorAll(".cantidad-btn");
-    
     botonesCantidad.forEach(boton => {
+        boton.removeEventListener("click", modificarCantidad);
         boton.addEventListener("click", modificarCantidad);
     });
 }
 
-// Modificar cantidad de producto
+// Modificar cantidad de producto (incrementar o decrementar)
 async function modificarCantidad(e) {
     const idProducto = e.currentTarget.dataset.id;
     const accion = e.currentTarget.dataset.action;
-    
+
     if (!dbManager) {
-        mostrarToast('Error: Base de datos no disponible', 'error');
         return;
     }
-    
+
     try {
         if (accion === 'incrementar') {
             await dbManager.incrementarCantidad(idProducto);
         } else if (accion === 'decrementar') {
             await dbManager.decrementarCantidad(idProducto);
         }
-        
-        // Recargar carrito
         await cargarProductosCarrito();
-        
-        // Actualizar numerito del carrito en otras páginas
-        actualizarNumerito();
-        
+        await actualizarNumerito();
     } catch (error) {
         console.error('Carrito: Error al modificar cantidad:', error);
-        mostrarToast('Error al actualizar cantidad', 'error');
     }
 }
 
 // Eliminar producto del carrito
 async function eliminarDelCarrito(e) {
     const idProducto = e.currentTarget.dataset.id;
-    
+
     if (!dbManager) {
-        mostrarToast('Error: Base de datos no disponible', 'error');
         return;
     }
-    
+
     try {
         await dbManager.eliminarDelCarrito(idProducto);
-        
-        mostrarToast('Repuesto eliminado del carrito', 'success');
-        
-        // Recargar carrito
         await cargarProductosCarrito();
-        
-        // Actualizar numerito del carrito
-        actualizarNumerito();
-        
+        await actualizarNumerito();
     } catch (error) {
         console.error('Carrito: Error al eliminar producto:', error);
-        mostrarToast('Error al eliminar producto', 'error');
     }
 }
 
 // Vaciar carrito completo
-botonVaciar.addEventListener("click", vaciarCarrito);
-
-async function vaciarCarrito() {
+botonVaciar.addEventListener("click", async () => {
     try {
         const totalProductos = productosEnCarrito.reduce((acc, producto) => acc + producto.cantidad, 0);
-        
         const resultado = await Swal.fire({
             title: '¿Estás seguro?',
             icon: 'question',
             html: `Se van a eliminar ${totalProductos} repuestos del carrito.`,
             showCancelButton: true,
-            focusConfirm: false,
             confirmButtonText: 'Sí, vaciar carrito',
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#dc2626',
@@ -257,43 +202,41 @@ async function vaciarCarrito() {
         if (resultado.isConfirmed) {
             await dbManager.vaciarCarrito();
             await cargarProductosCarrito();
-            actualizarNumerito();
-            
-            mostrarToast('Carrito vaciado correctamente', 'success');
+            await actualizarNumerito();
         }
     } catch (error) {
         console.error('Carrito: Error al vaciar carrito:', error);
-        mostrarToast('Error al vaciar carrito', 'error');
     }
-}
+});
 
-// Actualizar total
+// Actualizar total del carrito
 function actualizarTotal() {
-    const totalCalculado = productosEnCarrito.reduce((acc, producto) => acc + (producto.precio * producto.cantidad), 0);
+    const totalCalculado = productosEnCarrito.reduce((acc, producto) =>
+        acc + (producto.precio * producto.cantidad), 0);
     contenedorTotal.innerText = `$${totalCalculado.toLocaleString('es-CO')}`;
 }
 
-// Actualizar numerito del carrito - CORREGIDO
+// Actualizar contador del carrito (numerito)
 async function actualizarNumerito() {
     try {
-        // Usar el método correcto que existe en db.js
+        if (!dbManager) {
+            return;
+        }
         const totalProductos = await dbManager.obtenerContadorCarrito();
-        
-        // Actualizar en esta página si existe el elemento
+
         const numerito = document.querySelector("#numerito");
         if (numerito) {
             numerito.innerText = totalProductos;
         }
-        
-        // Comunicar a otras pestañas/ventanas
+
         if ('BroadcastChannel' in window) {
             const channel = new BroadcastChannel('carrito-updates');
             channel.postMessage({
                 type: 'carrito-actualizado',
                 total: totalProductos
             });
+            setTimeout(() => channel.close(), 1000);
         }
-        
     } catch (error) {
         console.error('Carrito: Error al actualizar numerito:', error);
     }
@@ -312,50 +255,51 @@ if ('BroadcastChannel' in window) {
     });
 }
 
-// Generar mensaje de WhatsApp
+console.log('Carrito.js: Script cargado correctamente');
+
+
+// Generar mensaje de WhatsApp para la compra
 function generarMensajeWhatsApp() {
     const totalCompra = productosEnCarrito.reduce((acc, producto) => acc + (producto.precio * producto.cantidad), 0);
     const cantidadProductos = productosEnCarrito.reduce((acc, producto) => acc + producto.cantidad, 0);
     const fecha = new Date().toLocaleDateString('es-CO');
-    
+
     let mensaje = `🏍️ *${NOMBRE_TIENDA}* - Nueva Orden de Compra\n\n`;
     mensaje += `🗓️ *Fecha:* ${fecha}\n`;
     mensaje += `📦 *Productos solicitados:* ${cantidadProductos}\n\n`;
     mensaje += `*DETALLE DEL PEDIDO:*\n`;
     mensaje += `━━━━━━━━━━━━━━━━━━━━\n`;
-    
+
     productosEnCarrito.forEach((producto, index) => {
         mensaje += `${index + 1}. *${producto.titulo}*\n`;
         mensaje += `   Cantidad: ${producto.cantidad}\n`;
         mensaje += `   Precio unitario: $${producto.precio.toLocaleString('es-CO')}\n`;
         mensaje += `   Subtotal: $${(producto.precio * producto.cantidad).toLocaleString('es-CO')}\n\n`;
     });
-    
+
     mensaje += `━━━━━━━━━━━━━━━━━━━━\n`;
     mensaje += `💰 *TOTAL A PAGAR: $${totalCompra.toLocaleString('es-CO')}*\n\n`;
     mensaje += `✅ *Solicito cotización y disponibilidad*\n`;
     mensaje += `💳 *Medio de pago preferido:* A coordinar\n`;
     mensaje += `🚛 *Entrega:* A coordinar\n\n`;
     mensaje += `¡Gracias por elegir ${NOMBRE_TIENDA}! 🏍️`;
-    
+
     return encodeURIComponent(mensaje);
 }
 
-// Abrir WhatsApp
+// Abrir WhatsApp con mensaje prellenado
 function abrirWhatsApp() {
     const mensaje = generarMensajeWhatsApp();
     const urlWhatsApp = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
-    
+
     window.open(urlWhatsApp, '_blank');
 }
 
-// Procesar compra
-botonComprar.addEventListener("click", comprarCarrito);
-
-async function comprarCarrito() {
+// Procesar compra al hacer clic en botón "Comprar ahora"
+botonComprar.addEventListener("click", async () => {
     const totalCompra = productosEnCarrito.reduce((acc, producto) => acc + (producto.precio * producto.cantidad), 0);
     const cantidadProductos = productosEnCarrito.reduce((acc, producto) => acc + producto.cantidad, 0);
-    
+
     try {
         const resultado = await Swal.fire({
             title: '¡Compra realizada!',
@@ -398,21 +342,21 @@ async function comprarCarrito() {
             if (segundoResultado.isConfirmed) {
                 // Registrar la compra antes de limpiar el carrito
                 await registrarCompra();
-                
+
                 // Abrir WhatsApp
                 abrirWhatsApp();
-                
+
                 // Limpiar carrito después de un breve delay
                 setTimeout(async () => {
                     try {
                         await dbManager.vaciarCarrito();
-                        actualizarNumerito();
-                        
+                        await actualizarNumerito();
+
                         contenedorCarritoVacio.classList.add("disabled");
                         contenedorCarritoProductos.classList.add("disabled");
                         contenedorCarritoAcciones.classList.add("disabled");
                         contenedorCarritoComprado.classList.remove("disabled");
-                        
+
                     } catch (error) {
                         console.error('Carrito: Error al limpiar después de compra:', error);
                     }
@@ -423,9 +367,9 @@ async function comprarCarrito() {
         console.error('Carrito: Error durante la compra:', error);
         mostrarToast('Error al procesar la compra', 'error');
     }
-}
+});
 
-// Registrar compra en el historial
+// Registrar compra en historial en IndexedDB
 async function registrarCompra() {
     try {
         const compra = {
@@ -436,16 +380,16 @@ async function registrarCompra() {
             cantidad: productosEnCarrito.reduce((acc, producto) => acc + producto.cantidad, 0),
             estado: 'enviado_whatsapp'
         };
-        
+
         await dbManager.registrarCompra(compra);
         console.log('Carrito: Compra registrada en historial');
-        
+
     } catch (error) {
         console.error('Carrito: Error al registrar compra:', error);
     }
 }
 
-// Función para mostrar toast
+// Función para mostrar toast con Toastify.js
 function mostrarToast(mensaje, tipo = 'info') {
     if (typeof Toastify !== 'undefined') {
         const colores = {
@@ -478,7 +422,7 @@ function mostrarToast(mensaje, tipo = 'info') {
     }
 }
 
-// Detectar cuando la app está offline/online
+// Detectar cambios de conexión y mostrar notificaciones
 window.addEventListener('online', () => {
     mostrarToast('Conexión restaurada', 'success');
 });
@@ -487,7 +431,7 @@ window.addEventListener('offline', () => {
     mostrarToast('Modo offline activado', 'info');
 });
 
-// Limpiar recursos cuando se cierra la página
+// Limpiar recursos BroadcastChannel al cerrar pestaña
 window.addEventListener('beforeunload', () => {
     if ('BroadcastChannel' in window) {
         const channel = new BroadcastChannel('carrito-updates');
