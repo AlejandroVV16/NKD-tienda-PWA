@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NKD Pereira - Carrito</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#000">
+</head>
+<body>
+
+    <div class="wrapper">
+        <header class="header-mobile">
+            <img src="img/logo/logo.png" alt="Nkd Pereira">
+            <button class="open-menu" id="open-menu">
+                <i class="bi bi-list"></i>
+            </button>
+        </header>
+        <aside>
+            <button class="close-menu" id="close-menu">
+                <i class="bi bi-x"></i>
+            </button>
+            <header>
+                <img src="img/logo/logo.png" alt="Nkd Pereira">
+            </header>
+            <nav>
+                <ul>
+                    <li>
+                        <a class="boton-menu boton-volver" href="./index.html">
+                            <i class="bi bi-arrow-return-left"></i> Seguir comprando
+                        </a>
+                    </li>
+                    <li>
+                        <a class="boton-menu boton-carrito active" href="./carrito.html">
+                            <i class="bi bi-cart-fill"></i> Mi Carrito <span id="numerito" class="numerito">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <footer>
+                <p class="texto-footer">© 2025 NKD Pereira</p>
+            </footer>
+        </aside>
+        <main>
+            <h2 class="titulo-principal">Mi Carrito de Compras</h2>
+            <div class="contenedor-carrito">
+                <p id="carrito-vacio" class="carrito-vacio">
+                    Tu carrito está vacío. ¡Encuentra los mejores repuestos para tu moto! 
+                    <i class="bi bi-emoji-frown"></i>
+                </p>
+
+                <div id="carrito-productos" class="carrito-productos disabled">
+                    <!-- Esto se va a completar con el JS -->
+                </div>
+
+                <div id="carrito-acciones" class="carrito-acciones disabled">
+                    <div class="carrito-acciones-izquierda">
+                        <button id="carrito-acciones-vaciar" class="carrito-acciones-vaciar">
+                            <i class="bi bi-trash"></i> Vaciar carrito
+                        </button>
+                    </div>
+                    <div class="carrito-acciones-derecha">
+                        <div class="carrito-acciones-total">
+                            <p>Total:</p>
+                            <p id="total">$0</p>
+                        </div>
+                        <button id="carrito-acciones-comprar" class="carrito-acciones-comprar">
+                            <i class="bi bi-credit-card"></i> Comprar ahora
+                        </button>
+                    </div>
+                </div>
+
+                <p id="carrito-comprado" class="carrito-comprado disabled">
+                    ¡Gracias por tu compra! Recibirás tus repuestos pronto. 
+                    <i class="bi bi-emoji-smile"></i>
+                </p>
+
+            </div>
+        </main>
+    </div>
+    
+    <!-- Scripts necesarios -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <!-- IMPORTANTE: Cargar db.js ANTES que carrito.js -->
+    <script src="./js/db.js"></script>
+    <script src="./js/carrito.js"></script>
+    <script src="./js/menu.js"></script>
+    <!-- PWA Scripts -->
+    <script src="./js/pwa.js"></script>
+</body>
+</html>

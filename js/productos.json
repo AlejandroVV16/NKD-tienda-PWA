@@ -1,0 +1,232 @@
+[
+    {
+        "id": "frenos-01",
+        "titulo": "Pastillas de freno",
+        "imagen": "./img/frenos/pastillas de freno.png",
+        "categoria": {
+            "nombre": "Frenos",
+            "id": "frenos"
+        },
+        "precio": 25000
+    },
+    {
+        "id": "frenos-02",
+        "titulo": "Pastillas de freno Kontrol",
+        "imagen": "./img/frenos/pastillas de freno kontrol.png",
+        "categoria": {
+            "nombre": "Frenos",
+            "id": "frenos"
+        },
+        "precio": 28000
+    },
+    {
+        "id": "frenos-03",
+        "titulo": "Disco de freno flotante",
+        "imagen": "./img/frenos/disco de freno.png",
+        "categoria": {
+            "nombre": "Frenos",
+            "id": "frenos"
+        },
+        "precio": 120000
+    },
+    {
+        "id": "frenos-04",
+        "titulo": "Bomba de freno YCF",
+        "imagen": "./img/frenos/bomba de freno ycf.png",
+        "categoria": {
+            "nombre": "Frenos",
+            "id": "frenos"
+        },
+        "precio": 95000
+    },
+    {
+        "id": "frenos-05",
+        "titulo": "Linea de freno blindado",
+        "imagen": "./img/frenos/linea de freno.png",
+        "categoria": {
+            "nombre": "Frenos",
+            "id": "frenos"
+        },
+        "precio": 55000
+    },
+    {
+        "id": "motor-01",
+        "titulo": "Filtro de aire UNI",
+        "imagen": "./img/motor/filtro uni.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 105000
+    },
+    {
+        "id": "motor-02",
+        "titulo": "Bujía de alto rendimiento",
+        "imagen": "./img/motor/bujia de iridium.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 32000
+    },
+    {
+        "id": "motor-03",
+        "titulo": "Aceite de motor 10W-40",
+        "imagen": "./img/motor/aceite 10w.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 55000
+    },
+    {
+        "id": "motor-04",
+        "titulo": "Kit de kontrol",
+        "imagen": "./img/motor/kit control.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 180000
+    },
+    {
+        "id": "motor-05",
+        "titulo": "Cadena casarella",
+        "imagen": "./img/motor/cadena.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 95000
+    },
+    {
+        "id": "motor-06",
+        "titulo": "aceite castrol",
+        "imagen": "./img/motor/castrol.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 28000
+    },
+    {
+        "id": "motor-07",
+        "titulo": "Carburador completo",
+        "imagen": "./img/motor/carburador.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 220000
+    },
+    {
+        "id": "motor-08",
+        "titulo": "Kit de valvulas",
+        "imagen": "./img/motor/kit valvulas.png",
+        "categoria": {
+            "nombre": "Motor",
+            "id": "motor"
+        },
+        "precio": 35000
+    },
+    {
+        "id": "electrico-01",
+        "titulo": "Batería 12V 9Ah",
+        "imagen": "./img/electrico/bateria.png",
+        "categoria": {
+            "nombre": "Eléctrico",
+            "id": "electrico"
+        },
+        "precio": 140000
+    },
+    {
+        "id": "electrico-02",
+        "titulo": "Faro LED KC",
+        "imagen": "./img/electrico/farola.png",
+        "categoria": {
+            "nombre": "Eléctrico",
+            "id": "electrico"
+        },
+        "precio": 120000
+    },
+    {
+        "id": "electrico-03",
+        "titulo": "Direccionales LED",
+        "imagen": "./img/electrico/direccionales.png",
+        "categoria": {
+            "nombre": "Eléctrico",
+            "id": "electrico"
+        },
+        "precio": 45000
+    },
+    {
+        "id": "electrico-04",
+        "titulo": "apagadores LED",
+        "imagen": "./img/electrico/apagadores.png",
+        "categoria": {
+            "nombre": "Eléctrico",
+            "id": "electrico"
+        },
+        "precio": 85000
+    },
+    {
+        "id": "electrico-05",
+        "titulo": "CDI",
+        "imagen": "./img/electrico/cdi.png",
+        "categoria": {
+            "nombre": "Eléctrico",
+            "id": "electrico"
+        },
+        "precio": 165000
+    },
+    {
+        "id": "accesorios-01",
+        "titulo": "Guantes FOX",
+        "imagen": "./img/accesorios/guantes.png",
+        "categoria": {
+            "nombre": "Accesorios",
+            "id": "accesorios"
+        },
+        "precio": 35000
+    },
+    {
+        "id": "accesorios-02",
+        "titulo": "Espejo retrovisor deportivo",
+        "imagen": "./img/accesorios/espejos r.png",
+        "categoria": {
+            "nombre": "Accesorios",
+            "id": "accesorios"
+        },
+        "precio": 88000
+    },
+    {
+        "id": "accesorios-03",
+        "titulo": "Portaequipaje trasero",
+        "imagen": "./img/accesorios/porta tracero.png",
+        "categoria": {
+            "nombre": "Accesorios",
+            "id": "accesorios"
+        },
+        "precio": 75000
+    },
+    {
+        "id": "accesorios-04",
+        "titulo": "Sillas",
+        "imagen": "./img/accesorios/sillas.png",
+        "categoria": {
+            "nombre": "Accesorios",
+            "id": "accesorios"
+        },
+        "precio": 155000
+    },
+    {
+        "id": "accesorios-05",
+        "titulo": "Cascos",
+        "imagen": "./img/accesorios/cascos.png",
+        "categoria": {
+            "nombre": "Accesorios",
+            "id": "accesorios"
+        },
+        "precio": 125000
+    }
+]
